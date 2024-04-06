@@ -1,0 +1,34 @@
+ Name: Lalit Pal
+Roll No.: L007
+MSc Data Science and AI
+Practical 8: Database backup and restore Using Workbench
+1.Backup
+
+
+1. Go to the Administration tab, on the Navigation panel (on the left by default)
+2. Select Data Export
+3. From the Data Export tab in the Tables To Export section, select the databases and tables that will be added to the backup file
+4. From the Export Option section, select the format for the exported data. Either each table will be exported to a separate .sql file, or one common .sql file will be created.
+5. Press the Export button to create a backup file.
+ 
+ 
+  When you click the Export button, a log of the export execution will be displayed, in which there will be a mysqldump command with the parameters specified in the interface.
+
+
+ 2.Restore
+
+
+
+ 
+1. Go to the Administration tab, on the Navigation panel (on the left by default)
+2. Select Data Import\Restore
+3. Select the source of the recovery Dump Project Folder or Self-Contained File, depending on what you selected at the backup stage
+4. If you used a Dump Project Folder, then you can select the databases and tables that need to be restored.
+5. If you use a Self-Contained File, then before restoring, you must select the schema into which you want to restore the dump. If you restore a dump to a server where the required schema does not exist, you can create it by clicking the New button.
+6. Press the Start Import button.
+
+
+
+
+
+

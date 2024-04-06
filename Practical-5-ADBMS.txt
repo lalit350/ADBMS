@@ -1,0 +1,149 @@
+Name: Lalit Pal
+Roll No.: L007
+MSc Data Science and AI
+Practical 5: Sharding using MongoDB
+
+
+Create a folder and in that folder make 9 files/folders with names -> primary, secondary1, secondary2, server1, server2, server3, shard1, shard2, shard3 and run the commands mentioned below
+
+REPLICATION
+~~~~~~~~~~~~
+
+**OPEN CMD AND RUN FOLLOWING COMMANDS** 
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+C:\Users\LALIT>cd C:\mogoshard
+
+start mongod --port=50000 --replSet="Server1" --dbpath="C:\mongoshard\primary"
+
+start mongod --port=50001 --replSet="Server1" --dbpath="C:\mongoshard\secondary1"
+
+start mongod --port=50002 --replSet="Server1" --dbpath="C:\mongoshard\secondary2"
+
+
+
+**OPEN CMD AND RUN FOLLOWING COMMANDS** 
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Microsoft Windows [Version 10.0.22621.3155]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\LALIT>mongosh --port=50000
+Current Mongosh Log ID: 65f08313daf480d082a47e42
+Connecting to:          mongodb://127.0.0.1:50000/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.5
+Using MongoDB:          7.0.5
+Using Mongosh:          2.1.5
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2024-03-12T21:59:01.395+05:30: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+   2024-03-12T21:59:01.396+05:30: This server is bound to localhost. Remote systems will be unable to connect to this server. Start the server with --bind_ip <address> to specify which IP addresses it should serve responses from, or with --bind_ip_all to bind to all interfaces. If this behavior is desired, start the server with --bind_ip 127.0.0.1 to disable this warning
+------
+
+test> rs.initiate({
+...     _id:"Server1",
+...     members:[
+...         {_id:0, host:"localhost:50000"},
+...         {_id:1, host:"localhost:50001"},
+...         {_id:2, host:"localhost:50002"}
+...     ]
+... });
+{ ok: 1 }
+Server1 [direct: secondary] test>
+
+
+
+CONFIG SERVERS
+~~~~~~~~~~~~~~~
+
+**OPEN CMD AND RUN FOLLOWING COMMANDS** 
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\LALIT>cd C:\mogoshard
+
+start mongod --configsvr --port=1030 --replSet="Server1" --dbpath="C:\mongoshard\server1"
+
+start mongod --configsvr --port=1040 --replSet="Server1" --dbpath="C:\mongoshard\server2"
+
+start mongod --configsvr --port=1050 --replSet="Server1" --dbpath="C:\mongoshard\server3"
+
+
+
+**OPEN CMD AND RUN FOLLOWING COMMANDS** 
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Microsoft Windows [Version 10.0.22621.3155]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\LALIT>mongosh --host="localhost:1030"
+Current Mongosh Log ID: 65f084803e226f2421899c2c
+Connecting to:          mongodb://localhost:1030/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.5
+Using MongoDB:          7.0.5
+Using Mongosh:          2.1.5
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2024-03-12T22:04:01.822+05:30: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+   2024-03-12T22:04:01.823+05:30: This server is bound to localhost. Remote systems will be unable to connect to this server. Start the server with --bind_ip <address> to specify which IP addresses it should serve responses from, or with --bind_ip_all to bind to all interfaces. If this behavior is desired, start the server with --bind_ip 127.0.0.1 to disable this warning
+------
+
+test> rs.initiate({
+...     _id:"Server1",
+...     configsvr:true,
+...     members:[
+...         {_id:0, host:"localhost:1030"},
+...         {_id:1, host:"localhost:1040"},
+...         {_id:2, host:"localhost:1050"}
+...     ]
+... })
+{ ok: 1 }
+Server1 [direct: other] test>
+
+
+
+SHARDS
+~~~~~~~
+
+**OPEN CMD AND RUN FOLLOWING COMMANDS** 
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\APEKSHA>cd C:\mogoshard
+
+start mongod --shardsvr --port=1130 --dbpath="C:\mongoshard\shard1" --replSet="Server1"
+
+start mongod --shardsvr --port=1140 --dbpath="C:\mongoshard\shard2" --replSet="Server1"
+
+start mongod --shardsvr --port=1150 --dbpath="C:\mongoshard\shard3" --replSet="Server1"
+
+
+
+**OPEN CMD AND RUN FOLLOWING COMMANDS** 
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Microsoft Windows [Version 10.0.22621.3155]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\LALIT>mongosh --host="localhost:1130"
+Current Mongosh Log ID: 65f0868d80f995ab2c101aae
+Connecting to:          mongodb://localhost:1130/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.5
+Using MongoDB:          7.0.5
+Using Mongosh:          2.1.5
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2024-03-12T22:13:29.993+05:30: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+   2024-03-12T22:13:29.994+05:30: This server is bound to localhost. Remote systems will be unable to connect to this server. Start the server with --bind_ip <address> to specify which IP addresses it should serve responses from, or with --bind_ip_all to bind to all interfaces. If this behavior is desired, start the server with --bind_ip 127.0.0.1 to disable this warning
+------
+
+test> rs.initiate({
+...     _id:"Server1",
+...     members: [
+...         {_id: 0, host: "localhost:1130"},
+...         {_id: 1, host: "localhost:1140"},
+...         {_id: 2, host: "localhost:1150"}
+...     ]
+... })
+{ ok: 1 }
+Server1 [direct: other] test>
